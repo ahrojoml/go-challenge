@@ -17,11 +17,14 @@ const timeFormat = "15:04"
 
 func main() {
 	file, err := os.Open("tickets.csv")
+	defer file.Close()
+
 	if err != nil {
 		panic("file not found")
 	}
 
 	reader := csv.NewReader(file)
+
 	var fields []string
 	var ticket ticketslib.Ticket
 	var id int
