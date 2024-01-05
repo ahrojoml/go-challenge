@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var tickets = []ticketslib.Ticket{}
+var tickets = make([]ticketslib.Ticket, 0, 1000)
 
 const timeFormat = "15:04"
 
