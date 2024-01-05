@@ -183,3 +183,38 @@ func TestDestinationPercentage(t *testing.T) {
 		)
 	}
 }
+
+func TestTimeToPeriod(t *testing.T) {
+	testCases := []struct {
+		name   string
+		date   time.Time
+		expect tickets.Period
+	}{
+		{
+			name:   "early morning",
+			date:   time.Date(0, 0, 0, 1, 23, 0, 0, time.UTC),
+			expect: tickets.EarlyMorning,
+		}, {
+			name:   "morning",
+			date:   time.Date(0, 0, 0, 8, 23, 0, 0, time.UTC),
+			expect: tickets.Morning,
+		}, {
+			name:   "afternoon",
+			date:   time.Date(0, 0, 0, 15, 23, 0, 0, time.UTC),
+			expect: tickets.Afternoon,
+		}, {
+			name:   "evening",
+			date:   time.Date(0, 0, 0, 23, 23, 0, 0, time.UTC),
+			expect: tickets.Evening,
+		},
+	}
+
+	for _, tC := range testCases {
+		t.Run(tC.name, func(t *testing.T) {
+			result := tickets.TimeToPeriod(tC.date)
+
+			require.Equal(t, tC.expect, result)
+		},
+		)
+	}
+}
