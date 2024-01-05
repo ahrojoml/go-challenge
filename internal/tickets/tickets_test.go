@@ -1,6 +1,7 @@
 package tickets_test
 
 import (
+	"fmt"
 	"testing"
 	"tickets/internal/tickets"
 	"time"
@@ -14,17 +15,17 @@ func TestGetTotalTickets(t *testing.T) {
 		tickets     *[]tickets.Ticket
 		country     string
 		expect      int
-		expectError bool
+		expectError error
 	}{
 		{
 			name:        "nil tickets",
 			country:     "Brazil",
 			expect:      0,
-			expectError: true,
+			expectError: &tickets.NullTicketsError{},
 		}, {
 			name:        "no county",
 			expect:      0,
-			expectError: true,
+			expectError: &tickets.CountryNotFoundError{},
 		}, {
 			name: "success",
 			tickets: &[]tickets.Ticket{
@@ -37,18 +38,17 @@ func TestGetTotalTickets(t *testing.T) {
 					Price:       12345.34,
 				},
 			},
-			country:     "Brazil",
-			expect:      1,
-			expectError: false,
+			country: "Brazil",
+			expect:  1,
 		},
 	}
 
-	for _, tC := range testCases {
-		t.Run(tC.name, func(t *testing.T) {
+	for idx, tC := range testCases {
+		t.Run(fmt.Sprintf("%d. %s", idx, tC.name), func(t *testing.T) {
 			result, err := tickets.GetTotalTickets(tC.tickets, tC.country)
 
-			if tC.expectError {
-				require.Error(t, err)
+			if tC.expectError != nil {
+				require.ErrorAs(t, err, tC.expectError)
 			} else {
 				require.Equal(t, tC.expect, result)
 				require.NoError(t, err)
@@ -64,13 +64,13 @@ func TestGetCountByPeriod(t *testing.T) {
 		tickets     *[]tickets.Ticket
 		period      tickets.Period
 		expect      int
-		expectError bool
+		expectError error
 	}{
 		{
 			name:        "nil tickets",
 			period:      tickets.Morning,
 			expect:      0,
-			expectError: true,
+			expectError: &tickets.NullTicketsError{},
 		}, {
 			name: "success",
 			tickets: &[]tickets.Ticket{
@@ -99,18 +99,17 @@ func TestGetCountByPeriod(t *testing.T) {
 					Price:       12345.34,
 				},
 			},
-			period:      tickets.EarlyMorning,
-			expect:      2,
-			expectError: false,
+			period: tickets.EarlyMorning,
+			expect: 2,
 		},
 	}
 
-	for _, tC := range testCases {
-		t.Run(tC.name, func(t *testing.T) {
+	for idx, tC := range testCases {
+		t.Run(fmt.Sprintf("%d. %s", idx, tC.name), func(t *testing.T) {
 			result, err := tickets.GetCountByPeriod(tC.tickets, tC.period)
 
-			if tC.expectError {
-				require.Error(t, err)
+			if tC.expectError != nil {
+				require.ErrorAs(t, err, tC.expectError)
 			} else {
 				require.Equal(t, tC.expect, result)
 			}
@@ -125,17 +124,17 @@ func TestDestinationPercentage(t *testing.T) {
 		tickets     *[]tickets.Ticket
 		destination string
 		expect      float64
-		expectError bool
+		expectError error
 	}{
 		{
 			name:        "nil tickets",
 			destination: "Brazil",
 			expect:      0,
-			expectError: true,
+			expectError: &tickets.NullTicketsError{},
 		}, {
 			name:        "no county",
 			expect:      0,
-			expectError: true,
+			expectError: &tickets.CountryNotFoundError{},
 		}, {
 			name: "success",
 			tickets: &[]tickets.Ticket{
@@ -166,16 +165,15 @@ func TestDestinationPercentage(t *testing.T) {
 			},
 			destination: "Brazil",
 			expect:      2.0 / 3.0,
-			expectError: false,
 		},
 	}
 
-	for _, tC := range testCases {
-		t.Run(tC.name, func(t *testing.T) {
+	for idx, tC := range testCases {
+		t.Run(fmt.Sprintf("%d. %s", idx, tC.name), func(t *testing.T) {
 			result, err := tickets.DestinationPercentage(tC.tickets, tC.destination)
 
-			if tC.expectError {
-				require.Error(t, err)
+			if tC.expectError != nil {
+				require.ErrorAs(t, err, tC.expectError)
 			} else {
 				require.Equal(t, tC.expect, result)
 			}
@@ -209,8 +207,8 @@ func TestTimeToPeriod(t *testing.T) {
 		},
 	}
 
-	for _, tC := range testCases {
-		t.Run(tC.name, func(t *testing.T) {
+	for idx, tC := range testCases {
+		t.Run(fmt.Sprintf("%d. %s", idx, tC.name), func(t *testing.T) {
 			result := tickets.TimeToPeriod(tC.date)
 
 			require.Equal(t, tC.expect, result)
