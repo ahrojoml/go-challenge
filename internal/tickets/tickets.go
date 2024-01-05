@@ -61,13 +61,16 @@ func GetCountByPeriod(tickets *[]Ticket, period Period) (int, error) {
 func TimeToPeriod(clockTime time.Time) Period {
 	hour := clockTime.Hour()
 
-	if 0 <= hour && hour <= 6 {
+	switch {
+	case 0 <= hour && hour <= 6:
 		return EarlyMorning
-	} else if 7 <= hour && hour <= 12 {
+	case 7 <= hour && hour <= 12:
 		return Morning
-	} else if 13 <= hour && hour <= 19 {
+	case 13 <= hour && hour <= 19:
 		return Afternoon
 	}
+
+	// since we are receiving a Time the value hour will always be between 0 and 23
 	return Evening
 }
 
