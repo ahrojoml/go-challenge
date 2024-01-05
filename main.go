@@ -16,7 +16,6 @@ var tickets = []ticketslib.Ticket{}
 const timeFormat = "15:04"
 
 func main() {
-	fmt.Println(os.Getwd())
 	file, err := os.Open("tickets.csv")
 	if err != nil {
 		panic("file not found")
@@ -77,7 +76,7 @@ func main() {
 	}
 	fmt.Printf("GetTotalTickets: %d\n", totalTickets)
 
-	totalTickets, err = ticketslib.GetCountByPeriod(&tickets, ticketslib.Afternoon)
+	totalTickets, err = ticketslib.GetCountByPeriod(&tickets, ticketslib.EarlyMorning)
 	if err != nil {
 		panic(err.Error())
 	}
