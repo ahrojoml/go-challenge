@@ -11,10 +11,20 @@ type Ticket struct {
 	Price       float64
 }
 
+type Period int
+
+const (
+	EarlyMorning Period = iota
+	Morning
+	Afternoon
+	Evening
+)
+
 func GetTotalTickets(tickets *[]Ticket, destination string) (int, error) {
 	if destination == "" {
 		return 0, NewCountryNotFoundError("no country of destination was given")
 	}
+
 	if tickets == nil {
 		return 0, NewNullTicketsError("no ticket data was given")
 	}
@@ -30,10 +40,53 @@ func GetTotalTickets(tickets *[]Ticket, destination string) (int, error) {
 	return counter, nil
 }
 
-func GetMornings(tickets []Ticket, time string) (int, error) {
-	return 0, nil
+func GetCountByPeriod(tickets *[]Ticket, period Period) (int, error) {
+	if tickets == nil {
+		return 0, NewNullTicketsError("no ticket data was given")
+	}
+
+	var counter int = 0
+
+	for _, ticket := range *tickets {
+		periodFromTime := TimeToPeriod(ticket.Time)
+
+		if periodFromTime == period {
+			counter += 1
+		}
+	}
+
+	return counter, nil
 }
 
-func AverageDestination(tickets []Ticket, destination string, total int) (int, error) {
-	return 0, nil
+func TimeToPeriod(clockTime time.Time) Period {
+	hour := clockTime.Hour()
+
+	if 0 <= hour && hour <= 6 {
+		return EarlyMorning
+	} else if 7 <= hour && hour <= 12 {
+		return Morning
+	} else if 13 <= hour && hour <= 19 {
+		return Afternoon
+	}
+	return Evening
+}
+
+func DestinationPercentage(tickets *[]Ticket, destination string) (float64, error) {
+	if destination == "" {
+		return 0, NewCountryNotFoundError("no country of destination was given")
+	}
+
+	if tickets == nil {
+		return 0, NewNullTicketsError("no ticket data was given")
+	}
+
+	var counter float64
+
+	for _, ticket := range *tickets {
+		if ticket.Destination == destination {
+			counter += 1
+		}
+	}
+
+	return counter / float64(len(*tickets)), nil
 }

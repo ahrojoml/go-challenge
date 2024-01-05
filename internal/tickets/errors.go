@@ -25,3 +25,13 @@ func (e CountryNotFoundError) Error() string {
 func NewCountryNotFoundError(msg string) CountryNotFoundError {
 	return CountryNotFoundError{msg: msg}
 }
+
+type InvalidHourError struct{}
+
+func (e InvalidHourError) Error() string {
+	return fmt.Sprintf("Error: invalid hour")
+}
+
+func NewInvalidHourError() InvalidHourError {
+	return InvalidHourError{}
+}
